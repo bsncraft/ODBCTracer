@@ -1,9 +1,15 @@
-; ODBCTracer.def : Deklariert die Modul-Parameter für die DLL.
+; ODBCTracer.def
 
 LIBRARY      ODBCTracer.dll
 
 EXPORTS
-    ; Explizite Exporte können hier eingefügt werden
+
+TraceSQLExecDirect
+TraceSQLExecDirectW
+TraceSQLFreeStmt
+TraceSQLPrepare
+TraceSQLPrepareW
+
 ;TraceSQLAllocConnect
 ;TraceSQLAllocEnv
 ;TraceSQLAllocStmt
@@ -22,18 +28,13 @@ EXPORTS
 ;TraceSQLDisconnect
 ;TraceSQLError
 ;TraceSQLErrorW
-;TraceSQLExecDirect
-;TraceSQLExecDirectW
 ;TraceSQLExecute
 ;TraceSQLFetch
 ;TraceSQLFreeConnect
 ;TraceSQLFreeEnv
-TraceSQLFreeStmt
 ;TraceSQLFreeHandle
 ;TraceSQLGetCursorName
 ;TraceSQLNumResultCols
-TraceSQLPrepare
-;TraceSQLPrepareW
 ;TraceSQLRowCount
 ;TraceSQLSetCursorName
 ;TraceSQLSetCursorNameW

@@ -20,6 +20,7 @@ ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 {
 	TraceFuncOption(TraceSQLPrepare, SQL_API_SQLPREPARE);
 	TraceFuncOption(TraceSQLFreeStmt, SQL_API_SQLFREESTMT);
+	TraceFuncOption(TraceSQLExecDirect, SQL_API_SQLEXECDIRECT);
 
 	/*TraceFuncOption(TraceSQLDataSources, SQL_API_SQLDATASOURCES);
 	TraceFuncOption(TraceSQLAllocHandleStd, SQL_API_SQLALLOCHANDLESTD);
@@ -66,7 +67,6 @@ ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 	TraceFuncOption(TraceSQLNumParams, SQL_API_SQLNUMPARAMS);
 	TraceFuncOption(TraceSQLSetScrollOptions, SQL_API_SQLSETSCROLLOPTIONS);
 	TraceFuncOption(TraceSQLExecute, SQL_API_SQLEXECUTE);
-	TraceFuncOption(TraceSQLExecDirect, SQL_API_SQLEXECDIRECT);
 	TraceFuncOption(TraceSQLNativeSql, SQL_API_SQLNATIVESQL);
 	TraceFuncOption(TraceSQLParamData, SQL_API_SQLPARAMDATA);
 	TraceFuncOption(TraceSQLPutData, SQL_API_SQLPUTDATA);

@@ -113,6 +113,56 @@ RETCODE SQL_API TraceSQLPrepare(SQLHSTMT hstmt, SQLCHAR FAR* szSqlStr, SQLINTEGE
 
 }
 
+RETCODE SQL_API TraceSQLPrepareW(SQLHSTMT hstmt,SQLWCHAR FAR *szSqlStr,SQLINTEGER cbSqlStr)
+{
+	ODBCTraceCall *call = new ODBCTraceCall();
+
+	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
+	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
+	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
+
+	call->unicode = true;
+	call->function_name = "SQLPrepareW";
+	call->function_id = SQL_API_SQLPREPARE;
+
+	ODBCTrace(call, true);
+	return (RETCODE)stack.push(call);
+
+}
+
+RETCODE SQL_API TraceSQLExecDirect(SQLHSTMT hstmt, SQLCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
+{
+	ODBCTraceCall *call = new ODBCTraceCall();
+
+	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
+	call->insertArgument("szSqlStr", TYP_SQLCHAR_PTR, szSqlStr);
+	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
+
+	call->function_name = "SQLExecDirect";
+	call->function_id = SQL_API_SQLEXECDIRECT;
+
+	ODBCTrace(call, true);
+	return (RETCODE)stack.push(call);
+
+}
+
+RETCODE SQL_API TraceSQLExecDirectW(SQLHSTMT hstmt, SQLWCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
+{
+	ODBCTraceCall *call = new ODBCTraceCall();
+
+	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
+	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
+	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
+
+	call->unicode = true;
+	call->function_name = "SQLExecDirectW";
+	call->function_id = SQL_API_SQLEXECDIRECT;
+
+	ODBCTrace(call, true);
+	return (RETCODE)stack.push(call);
+
+}
+
 BOOL APIENTRY DllMain( HANDLE hModule, 
                        DWORD  ul_reason_for_call, 
                        LPVOID lpReserved
@@ -139,7 +189,7 @@ BOOL APIENTRY DllMain( HANDLE hModule,
 RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)// open a trace log file
 {
 	char buffer[256]; wcstombs(buffer, s, sizeof(buffer));
-	MessageBox(NULL, buffer, "Log file", MB_OK | MB_ICONQUESTION);
+	//MessageBox(NULL, buffer, "Log file", MB_OK | MB_ICONQUESTION);
 	ODBCTraceOptions::getUniqueInstance()->logfile = buffer;
 	return 0;
 }
@@ -1298,22 +1348,6 @@ DWORD SQL_API TraceVersion()					// Returns trace API version
 //	return (RETCODE)stack.push(call);
 //
 //} 
-//RETCODE SQL_API TraceSQLPrepareW(SQLHSTMT hstmt,SQLWCHAR FAR *szSqlStr,SQLINTEGER cbSqlStr)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-//	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
-//	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-//
-//	call->unicode = true;
-//	call->function_name = "SQLPrepareW";
-//	call->function_id = SQL_API_SQLPREPARE;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
 //RETCODE SQL_API TraceSQLBindParameter(SQLHSTMT hstmt,SQLUSMALLINT ipar, 
 //									  SQLSMALLINT fParamType,
 //									  SQLSMALLINT fCType, 
@@ -1428,41 +1462,6 @@ DWORD SQL_API TraceVersion()					// Returns trace API version
 //	return (RETCODE)stack.push(call);
 //
 //}
-//RETCODE SQL_API TraceSQLExecDirect(SQLHSTMT hstmt, SQLCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-//	call->insertArgument("szSqlStr", TYP_SQLCHAR_PTR, szSqlStr);
-//	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-//
-//	call->function_name = "SQLExecDirect";
-//	call->function_id = SQL_API_SQLEXECDIRECT;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
-//
-//RETCODE SQL_API TraceSQLExecDirectW(SQLHSTMT hstmt, SQLWCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-//	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
-//	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-//
-//	call->unicode = true;
-//	call->function_name = "SQLExecDirectW";
-//	call->function_id = SQL_API_SQLEXECDIRECT;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
-//
-//
-//
 //RETCODE SQL_API TraceSQLNativeSql(SQLHDBC hdbc,
 //								  SQLCHAR FAR *szSqlStrIn, 
 //								  SQLINTEGER cbSqlStrIn,
