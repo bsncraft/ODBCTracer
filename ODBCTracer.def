@@ -11,6 +11,7 @@ TraceSQLFreeStmt
 TraceSQLMoreResults
 TraceSQLPrepare
 TraceSQLPrepareW
+;TraceSQLFetch
 
 ;TraceSQLAllocConnect
 ;TraceSQLAllocEnv
@@ -31,7 +32,6 @@ TraceSQLPrepareW
 ;TraceSQLError
 ;TraceSQLErrorW
 ;TraceSQLExecute
-;TraceSQLFetch
 ;TraceSQLFreeConnect
 ;TraceSQLFreeEnv
 ;TraceSQLFreeHandle

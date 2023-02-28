@@ -46,11 +46,6 @@ MutexGuard::~MutexGuard()
 	mutex->leave();
 }
 
-ODBCTraceCall::ODBCTraceCall() : arguments_count(0), retcode(0), unicode(false)
-{
-
-}
-
 void ODBCTraceCall::insertArgument(const char *name, ODBCTracer_ArgumentTypes type, void *value)
 {
 	arguments[arguments_count].name = name;
@@ -88,63 +83,14 @@ ODBCTraceCall* ODBCTraceStack::pop(int index)
 }
 
 void ODBCWriteLog(std::string log)
-{
-	if (ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
+{	
+	if (!ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
+		return;
+
+	FILE* file = fopen(ODBCTraceOptions::getUniqueInstance()->logfile.c_str(), "a");
+
+	if (file)
 	{
-		FILE* file = fopen(ODBCTraceOptions::getUniqueInstance()->logfile.c_str(), "a");
-
-		if (file)
-		{
-			char logtime[64]; _strtime(logtime);
-			fprintf(file, "%s %s\n", logtime, log.c_str());
-			fclose(file);
-		}
-	}
-}
-
-void ODBCTrace(ODBCTraceCall* call, bool calling)
-{
-	if (calling) return;
-	ODBCTraceOptions* option = ODBCTraceOptions::getUniqueInstance();
-
-	//log the functions of interest...
-	if (option->logFunction(call->function_id))
-	{
-
-		const std::string procId = std::to_string(GetCurrentProcessId());
-		const std::string proc = procId + "-" + std::to_string(GetCurrentThreadId());
-		const std::clock_t begin_time = clock();
-
-		for (int i = 0; i < call->arguments_count; i++)
-		{
-			ODBCTraceArgument* arg = &call->arguments[i];
-			switch (arg->type)
-			{
-			case TYP_SQLWCHAR_PTR:
-			{
-				if (!arg->value)
-					return;
-
-				char buffer[16000];
-				wcstombs(buffer, (SQLWCHAR*)arg->value, sizeof(buffer));
-				option->clocks[proc] = begin_time;
-				option->logs[proc] = buffer;
-				memset(buffer, 0, sizeof buffer);
-				return;
-			}
-			case TYP_SQLCHAR_PTR:
-			{
-				if (!arg->value)
-					return;
-
-				option->clocks[proc] = begin_time;
-				option->logs[proc] = (char*)arg->value;
-				return;
-			}
-			}
-		}
-
-		char	szProcName[MAX_PATH];
 		std::string cmdLine = GetCommandLine();
 		auto pos1 = cmdLine.find('\"');
 		if (pos1 >= 0)
@@ -167,52 +113,89 @@ void ODBCTrace(ODBCTraceCall* call, bool calling)
 			cmdLine = "excel";
 		}
 
-		_splitpath(cmdLine.c_str(), NULL, NULL, szProcName, NULL);
-		std::string log = szProcName;
+		char szProcName[MAX_PATH]; _splitpath(cmdLine.c_str(), NULL, NULL, szProcName, NULL);
 
-		log.append(' ' + procId + ' ');
+
+		char logtime[64]; _strtime(logtime);
+		fprintf(file, "%s %s %s\n", logtime, szProcName, log.c_str());
+		fclose(file);
+	}
+}
+
+void ODBCTrace(ODBCTraceCall* call)
+{
+	ODBCTraceOptions* option = ODBCTraceOptions::getUniqueInstance();
+
+	if (option->logFunction(call->function_id))
+	{
+		const std::pair<int, int> proc = std::make_pair(GetCurrentProcessId(), GetCurrentThreadId());		
+		const std::clock_t begin_time = clock();
+
+		for (int i = 0; i < call->arguments_count; i++)
+		{
+			ODBCTraceArgument* arg = &call->arguments[i];
+			switch (arg->type)
+			{
+			case TYP_SQLWCHAR_PTR:
+			{
+				if (!arg->value)
+					return;
+
+				std::wstring ws((SQLWCHAR*)arg->value);
+				std::string str(ws.begin(), ws.end());
+				option->clocks[proc] = begin_time;
+				option->logs[proc] = str;
+				return;
+			}
+			case TYP_SQLCHAR_PTR:
+			{
+				if (!arg->value)
+					return;
+
+				option->clocks[proc] = begin_time;
+				option->logs[proc] = (char*)arg->value;
+				return;
+			}
+			}
+		}
 
 		if (option->clocks.count(proc) == 0 || option->logs.count(proc) == 0)
 			return;
 
-		auto ticks = float(begin_time - option->clocks.at(proc)) / CLOCKS_PER_SEC;
-		option->clocks.erase(proc);
-		log.append(' ' + std::to_string(round(ticks * 100) / 100).substr(0, 4));
-		log.append("ms ");
+		ODBCWriteLog(std::to_string(proc.first) + " " + 
+			std::to_string(float(begin_time - option->clocks.at(proc)) / CLOCKS_PER_SEC).substr(0, 5) + "ms " +
+			std::regex_replace(option->logs.at(proc), std::regex("\\r\\n|\\r|\\n"), " "));
 
-		auto& statement = std::regex_replace(option->logs.at(proc), std::regex("\\r\\n|\\r|\\n"), " ");
-		log.append(statement);
 		option->logs.erase(proc);
-
-		ODBCWriteLog(log);
+		option->clocks.erase(proc);
 	}
 }
+
+//RETCODE SQL_API TraceSQLFetch(SQLHSTMT hstmt)
+//{
+//	ODBCTraceCall *call = new ODBCTraceCall();
+//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
+//	call->function_name = "SQLFetch";
+//	call->function_id = SQL_API_SQLFETCH;
+//	return (RETCODE)stack.push(call);
+//}
 
 RETCODE SQL_API TraceSQLFreeStmt(SQLHSTMT hstmt, SQLUSMALLINT fOption)
 {
 	ODBCTraceCall* call = new ODBCTraceCall();
-
 	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
 	call->insertArgument("fOption", TYP_SQLUSMALLINT, (void*)fOption);
-
 	call->function_name = "SQLFreeStmt";
 	call->function_id = SQL_API_SQLFREESTMT;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
-
 }
 
 RETCODE SQL_API TraceSQLMoreResults(SQLHSTMT  hstmt)
 {
 	ODBCTraceCall *call = new ODBCTraceCall();
-
 	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-
 	call->function_name = "SQLMoreResults";
 	call->function_id = SQL_API_SQLMORERESULTS;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
 
 }
@@ -225,7 +208,6 @@ RETCODE SQL_API TraceSQLPrepare(SQLHSTMT hstmt, SQLCHAR FAR* szSqlStr, SQLINTEGE
 	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
 	call->function_name = "SQLPrepare";
 	call->function_id = SQL_API_SQLPREPARE;
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
 
 }
@@ -233,32 +215,23 @@ RETCODE SQL_API TraceSQLPrepare(SQLHSTMT hstmt, SQLCHAR FAR* szSqlStr, SQLINTEGE
 RETCODE SQL_API TraceSQLPrepareW(SQLHSTMT hstmt,SQLWCHAR FAR *szSqlStr,SQLINTEGER cbSqlStr)
 {
 	ODBCTraceCall *call = new ODBCTraceCall();
-
 	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
 	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
 	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-
 	call->unicode = true;
 	call->function_name = "SQLPrepareW";
 	call->function_id = SQL_API_SQLPREPARE;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
-
 }
 
 RETCODE SQL_API TraceSQLExecDirect(SQLHSTMT hstmt, SQLCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
 {
 	ODBCTraceCall *call = new ODBCTraceCall();
-
 	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
 	call->insertArgument("szSqlStr", TYP_SQLCHAR_PTR, szSqlStr);
 	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-
 	call->function_name = "SQLExecDirect";
 	call->function_id = SQL_API_SQLEXECDIRECT;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
 
 }
@@ -266,16 +239,12 @@ RETCODE SQL_API TraceSQLExecDirect(SQLHSTMT hstmt, SQLCHAR FAR *szSqlStr, SQLINT
 RETCODE SQL_API TraceSQLExecDirectW(SQLHSTMT hstmt, SQLWCHAR FAR *szSqlStr, SQLINTEGER cbSqlStr)
 {
 	ODBCTraceCall *call = new ODBCTraceCall();
-
 	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
 	call->insertArgument("szSqlStr", TYP_SQLWCHAR_PTR, szSqlStr);
 	call->insertArgument("cbSqlStr", TYP_SQLINTEGER, (void*)cbSqlStr);
-
 	call->unicode = true;
 	call->function_name = "SQLExecDirectW";
 	call->function_id = SQL_API_SQLEXECDIRECT;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
 
 }
@@ -283,24 +252,21 @@ RETCODE SQL_API TraceSQLExecDirectW(SQLHSTMT hstmt, SQLWCHAR FAR *szSqlStr, SQLI
 RETCODE SQL_API TraceSQLCloseCursor(SQLHSTMT Handle)
 {
 	ODBCTraceCall *call = new ODBCTraceCall();
-
 	call->insertArgument("Handle", TYP_SQLHSTMT, Handle);
-
 	call->function_name = "SQLCloseCursor";
 	call->function_id = SQL_API_SQLCLOSECURSOR;
-
-	ODBCTrace(call, true);
 	return (RETCODE)stack.push(call);
 
 }
 
 RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)
 {
-	char buffer[256]; wcstombs(buffer, s, sizeof(buffer));
+	std::wstring ws(s);
+	std::string str(ws.begin(), ws.end());
 
 	//Pause for attaching
-	//MessageBox(NULL, buffer, "Log file", MB_OK | MB_ICONQUESTION);
-	ODBCTraceOptions::getUniqueInstance()->logfile = buffer;
+	//MessageBox(NULL, str, "Log file", MB_OK | MB_ICONQUESTION);
+	ODBCTraceOptions::getUniqueInstance()->logfile = str;
 	return 0;
 }
 
@@ -315,7 +281,7 @@ VOID SQL_API TraceReturn(RETCODE rethandle, RETCODE retcode)
 	if (call != NULL)
 	{
 		call->retcode = retcode;
-		ODBCTrace(call, false);
+		ODBCTrace(call);
 		delete call;
 	}
 }
@@ -1054,19 +1020,6 @@ DWORD SQL_API TraceVersion()
 //
 //	call->function_name = "SQLBindCol";
 //	call->function_id = SQL_API_SQLBINDCOL;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
-//RETCODE SQL_API TraceSQLFetch(SQLHSTMT hstmt)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-//
-//	call->function_name = "SQLFetch";
-//	call->function_id = SQL_API_SQLFETCH;
 //
 //	ODBCTrace(call, true);
 //	return (RETCODE)stack.push(call);

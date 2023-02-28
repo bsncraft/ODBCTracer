@@ -8,9 +8,6 @@
 typedef std::map<std::string, int> CHAR2FuncSwitchMAP;
 typedef std::map<int, bool> INT2FuncSwitchMAP;
 
-/**
- * Mutual exclusion
- */
 class Mutex
 {
 public:
@@ -33,9 +30,6 @@ protected:
 	Mutex *mutex;
 };
 
-/**
- * General options. 
- */
 class ODBCTraceOptions
 {
 private:
@@ -46,7 +40,6 @@ private:
 	void init(const char *fn, int fid);
 public:
 	static ODBCTraceOptions* getUniqueInstance();
-	//Functionname to function id...
 	static int FN2ID(const char *n);
 
 	bool logFunction(int functionid);
@@ -56,15 +49,13 @@ public:
 	bool fileloggingactivated;
 	std::string logfile;
 	std::vector<std::string> keys;
-	std::map<std::string, std::string> logs;
-	std::map<std::string, std::clock_t> clocks;
+	std::map<std::pair <int, int>, std::string> logs;
+	std::map<std::pair <int, int>, std::clock_t> clocks;
 };
 
 #define ODBCTRACE_STACKSIZE 256
 #define MAX_ARGUMENTS 20
-/**
- * SQL_TYPES
- */
+
 enum ODBCTracer_ArgumentTypes
 {
 	TYP_UNKNOWN = 0,
@@ -107,7 +98,6 @@ struct ODBCTraceArgument
 
 struct ODBCTraceCall
 {
-	ODBCTraceCall();
 	void insertArgument(const char *name, ODBCTracer_ArgumentTypes type, void *value); 
 
 	std::string function_name;
@@ -130,7 +120,7 @@ struct ODBCTraceStack
 };
 
 
-void ODBCTrace(ODBCTraceCall *call, bool calling);
+void ODBCTrace(ODBCTraceCall *call);
 
 
 #endif //#if !defined(ODBCDRIVERDELEGATOR_13_06_2005_ARINIR_H)
