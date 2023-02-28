@@ -15,10 +15,11 @@ void ODBCTraceOptions::init(const char *fn, int fid)
 
 ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 {
-	TraceFuncOption(TraceSQLPrepare, SQL_API_SQLPREPARE);
-	TraceFuncOption(TraceSQLFreeStmt, SQL_API_SQLFREESTMT);
 	TraceFuncOption(TraceSQLExecDirect, SQL_API_SQLEXECDIRECT);
+	TraceFuncOption(TraceSQLPrepare, SQL_API_SQLPREPARE);
+	TraceFuncOption(TraceSQLFreeStmt, SQL_API_SQLFREESTMT);	
 	TraceFuncOption(TraceSQLCloseCursor, SQL_API_SQLCLOSECURSOR);
+	TraceFuncOption(TraceSQLMoreResults, SQL_API_SQLMORERESULTS);
 
 	/*TraceFuncOption(TraceSQLDataSources, SQL_API_SQLDATASOURCES);
 	TraceFuncOption(TraceSQLAllocHandleStd, SQL_API_SQLALLOCHANDLESTD);
@@ -44,8 +45,7 @@ ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 	TraceFuncOption(TraceSQLColAttributes, SQL_API_SQLCOLATTRIBUTES);
 	TraceFuncOption(TraceSQLBindCol, SQL_API_SQLBINDCOL);
 	TraceFuncOption(TraceSQLFetch, SQL_API_SQLFETCH);
-	TraceFuncOption(TraceSQLGetData, SQL_API_SQLGETDATA);
-	TraceFuncOption(TraceSQLMoreResults, SQL_API_SQLMORERESULTS);
+	TraceFuncOption(TraceSQLGetData, SQL_API_SQLGETDATA);	
 	TraceFuncOption(TraceSQLRowCount, SQL_API_SQLROWCOUNT);
 	TraceFuncOption(TraceSQLExtendedFetch, SQL_API_SQLEXTENDEDFETCH);
 	TraceFuncOption(TraceSQLFetchScroll, SQL_API_SQLFETCHSCROLL);

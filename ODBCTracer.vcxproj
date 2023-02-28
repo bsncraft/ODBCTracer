@@ -128,10 +128,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>REM -- On a 32 bit OS this will copy to the system32 directory. On a 64 bit OS this will copy to syswow64
-copy $(TargetPath) c:\windows\system32
-if $(Configuration)==Debug copy $(TargetDir)$(TargetName).pdb $(SystemRoot)\system32
-</Command>
+      <Command>copy $(TargetPath) c:\windows\syswow64</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,9 +165,7 @@ if $(Configuration)==Debug copy $(TargetDir)$(TargetName).pdb $(SystemRoot)\syst
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetPath) c:\windows\sysnative
-if $(Configuration)==Debug copy $(TargetDir)$(TargetName).pdb $(SystemRoot)\sysnative
-</Command>
+      <Command>copy $(TargetPath) c:\windows\system32</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

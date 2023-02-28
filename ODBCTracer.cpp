@@ -98,6 +98,20 @@ RETCODE SQL_API TraceSQLFreeStmt(SQLHSTMT hstmt, SQLUSMALLINT fOption)
 
 }
 
+RETCODE SQL_API TraceSQLMoreResults(SQLHSTMT  hstmt)
+{
+	ODBCTraceCall *call = new ODBCTraceCall();
+
+	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
+
+	call->function_name = "SQLMoreResults";
+	call->function_id = SQL_API_SQLMORERESULTS;
+
+	ODBCTrace(call, true);
+	return (RETCODE)stack.push(call);
+
+}
+
 RETCODE SQL_API TraceSQLPrepare(SQLHSTMT hstmt, SQLCHAR FAR* szSqlStr, SQLINTEGER cbSqlStr)
 {
 	ODBCTraceCall* call = new ODBCTraceCall();
@@ -970,19 +984,6 @@ DWORD SQL_API TraceVersion()
 //
 //	call->function_name = "SQLGetData";
 //	call->function_id = SQL_API_SQLGETDATA;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
-//RETCODE SQL_API TraceSQLMoreResults(SQLHSTMT  hstmt)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
-//
-//	call->function_name = "SQLMoreResults";
-//	call->function_id = SQL_API_SQLMORERESULTS;
 //
 //	ODBCTrace(call, true);
 //	return (RETCODE)stack.push(call);

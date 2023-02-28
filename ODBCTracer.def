@@ -4,12 +4,13 @@ LIBRARY      ODBCTracer.dll
 
 EXPORTS
 
+TraceSQLCloseCursor
 TraceSQLExecDirect
 TraceSQLExecDirectW
 TraceSQLFreeStmt
+TraceSQLMoreResults
 TraceSQLPrepare
 TraceSQLPrepareW
-TraceSQLCloseCursor
 
 ;TraceSQLAllocConnect
 ;TraceSQLAllocEnv
@@ -76,7 +77,6 @@ TraceSQLCloseCursor
 ;TraceSQLDescribeParam
 ;TraceSQLExtendedFetch
 ;TraceSQLForeignKeys
-;TraceSQLMoreResults
 ;TraceSQLNativeSql
 ;TraceSQLNativeSqlW
 ;TraceSQLNumParams
