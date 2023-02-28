@@ -11,13 +11,8 @@ TraceSQLFreeStmt
 TraceSQLMoreResults
 TraceSQLPrepare
 TraceSQLPrepareW
-;TraceSQLFetch
-
+TraceSQLFetch
 TraceOpenLogFile
 TraceCloseLogFile
 TraceReturn
 TraceVersion
-
-;
-DllMain
-;

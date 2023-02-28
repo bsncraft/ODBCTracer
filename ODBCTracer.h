@@ -35,8 +35,8 @@ public:
 	static ODBCTraceOptions* get();	
 	bool recordLogging;
 	std::string logfile;
-	std::map<std::pair <int, int>, std::string> logs;
-	std::map<std::pair <int, int>, std::clock_t> clocks;
+	std::string statement;
+	std::clock_t begin_time;
 };
 
 #define ODBCTRACE_STACKSIZE 256
@@ -85,12 +85,9 @@ struct ODBCTraceArgument
 struct ODBCTraceCall
 {
 	void insertArgument(const char *name, ODBCTracer_ArgumentTypes type, void *value); 
-
-	std::string function_name;
 	int function_id;
 	int arguments_count;
 	int retcode;
-	bool unicode;
 	ODBCTraceArgument arguments[MAX_ARGUMENTS];
 };
 
