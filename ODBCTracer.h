@@ -97,15 +97,14 @@ enum ODBCTracer_ArgumentTypes
 	TYP_SQLHENV_PTR,
 	TYP_SQLHANDLE_PTR
 };
-/**
- * Used by each TraceXXX function to fill debug information about ODBC function call...
- */
+
 struct ODBCTraceArgument
 {
 	std::string name;
 	ODBCTracer_ArgumentTypes type;
 	void *value;
 };
+
 struct ODBCTraceCall
 {
 	ODBCTraceCall();
@@ -118,11 +117,7 @@ struct ODBCTraceCall
 	bool unicode;
 	ODBCTraceArgument arguments[MAX_ARGUMENTS];
 };
-/**
- * Little different semantic to known stack. Each ODBC-API invocation gets one position from this
- * stack. By pushing trace calls to this stack one can determine the calling function in 
- * TraceReturn(...).
- */
+
 struct ODBCTraceStack
 {
 	ODBCTraceStack();
@@ -134,11 +129,8 @@ struct ODBCTraceStack
 	ODBCTraceCall* stack[ODBCTRACE_STACKSIZE];
 };
 
-/**
- * dumps invocation information in either way: calling or returning
- */
+
 void ODBCTrace(ODBCTraceCall *call, bool calling);
-void ODBCTraceDump(const char *text, ...);
-//void ODBCTraceAppendText2Dialog(const char *text);
+
 
 #endif //#if !defined(ODBCDRIVERDELEGATOR_13_06_2005_ARINIR_H)

@@ -245,20 +245,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ODBCTraceDump.cpp">
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ODBCDRIVER_EXPORTS;WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>
-      <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Disabled</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ODBCDRIVER_EXPORTS;WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
-      <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnableFastChecks</BasicRuntimeChecks>
-      <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</BrowseInformation>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ODBCDRIVER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">MaxSpeed</Optimization>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ODBCDRIVER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="ODBCTracer.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ODBCDRIVER_EXPORTS;WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
