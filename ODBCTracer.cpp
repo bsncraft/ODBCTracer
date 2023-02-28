@@ -88,7 +88,7 @@ RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)
 	//Pause for attaching
 	//MessageBox(NULL, str.c_str(), "Log file", MB_OK | MB_ICONQUESTION);
 	ODBCTraceOptions::get()->logfile = str;
-	ODBCTraceOptions::get()->recordLogging = str.find("count") != std::string::npos;
+	ODBCTraceOptions::get()->recordLogging = str.find("_nc") == std::string::npos;
 	return 0;
 }
 
@@ -158,6 +158,14 @@ void ODBCTrace(ODBCTraceCall* call)
 		if (!option->recordLogging)
 			return;
 
+		if (call->retcode == 0)
+		{
+			option->record_count++;
+			option->total_count++;
+			option->total_output++;
+		}
+		
+		return;
 	}
 	case SQL_API_SQLFREESTMT:
 	case SQL_API_SQLMORERESULTS:
@@ -166,9 +174,34 @@ void ODBCTrace(ODBCTraceCall* call)
 		if (option->statement == "")
 			return;
 
-		ODBCWriteLog(std::to_string(GetCurrentProcessId()) + " " +
-			std::to_string(clock() - option->begin_time) + "ms " +
-			std::regex_replace(option->statement, std::regex("\\r\\n|\\r|\\n"), " "));
+		std::string output = std::to_string(GetCurrentProcessId()) + " ";
+		std::string number_str = std::to_string(clock() - option->begin_time);
+		for (int i = number_str.length() - 3; i > 0; i -= 3)
+			number_str.insert(i, ",");
+		output.append(number_str + "ms ");
+
+		if (option->recordLogging)
+		{
+			number_str = std::to_string(option->record_count);			
+			for (int i = number_str.length() - 3; i > 0; i -= 3)
+				number_str.insert(i, ",");
+			output.append(number_str + " Recs ");
+			option->record_count = 0;
+			
+			if (option->total_output > 500000)
+			{
+				option->total_output = 0;
+				number_str = std::to_string(option->total_count);
+				
+				for (int i = number_str.length() - 3; i > 0; i -= 3)
+					number_str.insert(i, ",");
+
+				output.append("(" + number_str + " Total) ");
+			}
+		}
+		
+		output.append(std::regex_replace(option->statement, std::regex("\\r\\n|\\r|\\n"), " "));
+		ODBCWriteLog(output);
 
 		break;
 	}

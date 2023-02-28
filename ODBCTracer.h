@@ -37,6 +37,9 @@ public:
 	std::string logfile;
 	std::string statement;
 	std::clock_t begin_time;
+	int record_count;
+	int total_count;
+	int total_output;
 };
 
 #define ODBCTRACE_STACKSIZE 256
@@ -94,10 +97,8 @@ struct ODBCTraceCall
 struct ODBCTraceStack
 {
 	ODBCTraceStack();
-
 	int push(ODBCTraceCall *call);
 	ODBCTraceCall* pop(int index);
-
 	Mutex lock;
 	ODBCTraceCall* stack[ODBCTRACE_STACKSIZE];
 };
