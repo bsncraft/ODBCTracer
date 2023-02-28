@@ -4,10 +4,6 @@
 #include <sstream>
 #include <sqltypes.h>
 
-#define DeclareString(s) static const char * str ## s = #s
-typedef std::map<std::string, int> CHAR2FuncSwitchMAP;
-typedef std::map<int, bool> INT2FuncSwitchMAP;
-
 class Mutex
 {
 public:
@@ -32,23 +28,13 @@ protected:
 
 class ODBCTraceOptions
 {
-private:
-	ODBCTraceOptions();
-	static ODBCTraceOptions* unique_instance;
-	static CHAR2FuncSwitchMAP fn2id;
-	INT2FuncSwitchMAP options;
-	void init(const char *fn, int fid);
+private:	
+	static ODBCTraceOptions* inst;
+	
 public:
-	static ODBCTraceOptions* getUniqueInstance();
-	static int FN2ID(const char *n);
-
-	bool logFunction(int functionid);
-	bool logFunction(const char *function);
-	void setLogFunction(const char *function, bool log);
-
-	bool fileloggingactivated;
+	static ODBCTraceOptions* get();	
+	bool recordLogging;
 	std::string logfile;
-	std::vector<std::string> keys;
 	std::map<std::pair <int, int>, std::string> logs;
 	std::map<std::pair <int, int>, std::clock_t> clocks;
 };

@@ -5,12 +5,12 @@
 #include "ODBCTracer.h"
 #include <assert.h>
 
-ODBCTraceOptions* ODBCTraceOptions::unique_instance;
-ODBCTraceOptions* ODBCTraceOptions::getUniqueInstance() 
+ODBCTraceOptions* ODBCTraceOptions::inst;
+ODBCTraceOptions* ODBCTraceOptions::get() 
 {
-	if (unique_instance == NULL)
-		unique_instance = new ODBCTraceOptions();
-	return unique_instance;
+	if (inst == NULL)
+		inst = new ODBCTraceOptions();
+	return inst;
 }
 
 ODBCTraceStack stack;
@@ -18,7 +18,6 @@ ODBCTraceStack stack;
 Mutex::Mutex()
 {
 	InitializeCriticalSection(&CriticalSection); 
-
 }
 
 Mutex::~Mutex()
@@ -83,11 +82,9 @@ ODBCTraceCall* ODBCTraceStack::pop(int index)
 }
 
 void ODBCWriteLog(std::string log)
-{	
-	if (!ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
-		return;
+{		
 
-	FILE* file = fopen(ODBCTraceOptions::getUniqueInstance()->logfile.c_str(), "a");
+	FILE* file = fopen(ODBCTraceOptions::get()->logfile.c_str(), "a");
 
 	if (file)
 	{
@@ -124,55 +121,55 @@ void ODBCWriteLog(std::string log)
 
 void ODBCTrace(ODBCTraceCall* call)
 {
-	ODBCTraceOptions* option = ODBCTraceOptions::getUniqueInstance();
+	ODBCTraceOptions* option = ODBCTraceOptions::get();
 
-	if (option->logFunction(call->function_id))
+	const std::pair<int, int> proc = std::make_pair(GetCurrentProcessId(), GetCurrentThreadId());		
+	const std::clock_t begin_time = clock();
+
+	for (int i = 0; i < call->arguments_count; i++)
 	{
-		const std::pair<int, int> proc = std::make_pair(GetCurrentProcessId(), GetCurrentThreadId());		
-		const std::clock_t begin_time = clock();
-
-		for (int i = 0; i < call->arguments_count; i++)
+		ODBCTraceArgument* arg = &call->arguments[i];
+		switch (arg->type)
 		{
-			ODBCTraceArgument* arg = &call->arguments[i];
-			switch (arg->type)
-			{
-			case TYP_SQLWCHAR_PTR:
-			{
-				if (!arg->value)
-					return;
-
-				std::wstring ws((SQLWCHAR*)arg->value);
-				std::string str(ws.begin(), ws.end());
-				option->clocks[proc] = begin_time;
-				option->logs[proc] = str;
+		case TYP_SQLWCHAR_PTR:
+		{
+			if (!arg->value)
 				return;
-			}
-			case TYP_SQLCHAR_PTR:
-			{
-				if (!arg->value)
-					return;
 
-				option->clocks[proc] = begin_time;
-				option->logs[proc] = (char*)arg->value;
-				return;
-			}
-			}
-		}
-
-		if (option->clocks.count(proc) == 0 || option->logs.count(proc) == 0)
+			std::wstring ws((SQLWCHAR*)arg->value);
+			std::string str(ws.begin(), ws.end());
+			option->clocks[proc] = begin_time;
+			option->logs[proc] = str;
 			return;
+		}
+		case TYP_SQLCHAR_PTR:
+		{
+			if (!arg->value)
+				return;
 
-		ODBCWriteLog(std::to_string(proc.first) + " " + 
-			std::to_string(float(begin_time - option->clocks.at(proc)) / CLOCKS_PER_SEC).substr(0, 5) + "ms " +
-			std::regex_replace(option->logs.at(proc), std::regex("\\r\\n|\\r|\\n"), " "));
-
-		option->logs.erase(proc);
-		option->clocks.erase(proc);
+			option->clocks[proc] = begin_time;
+			option->logs[proc] = (char*)arg->value;
+			return;
+		}
+		}
 	}
+
+	if (option->clocks.count(proc) == 0 || option->logs.count(proc) == 0)
+		return;
+
+	ODBCWriteLog(std::to_string(proc.first) + " " + 
+		std::to_string(float(begin_time - option->clocks.at(proc)) / CLOCKS_PER_SEC).substr(0, 5) + "ms " +
+		std::regex_replace(option->logs.at(proc), std::regex("\\r\\n|\\r|\\n"), " "));
+
+	option->logs.erase(proc);
+	option->clocks.erase(proc);
 }
 
 //RETCODE SQL_API TraceSQLFetch(SQLHSTMT hstmt)
 //{
+//	if (!ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
+//		return;
+// 
 //	ODBCTraceCall *call = new ODBCTraceCall();
 //	call->insertArgument("hstmt", TYP_SQLHSTMT, hstmt);
 //	call->function_name = "SQLFetch";
@@ -265,8 +262,8 @@ RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)
 	std::string str(ws.begin(), ws.end());
 
 	//Pause for attaching
-	//MessageBox(NULL, str, "Log file", MB_OK | MB_ICONQUESTION);
-	ODBCTraceOptions::getUniqueInstance()->logfile = str;
+	MessageBox(NULL, str.c_str(), "Log file", MB_OK | MB_ICONQUESTION);
+	ODBCTraceOptions::get()->logfile = str;
 	return 0;
 }
 

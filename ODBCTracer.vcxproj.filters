@@ -11,16 +11,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="odbctracedump.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="ODBCTracer.cpp">
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
-    <ClCompile Include="ODBCTracerOptions.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
