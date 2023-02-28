@@ -66,7 +66,6 @@ ODBCTraceStack::ODBCTraceStack()
 
 int ODBCTraceStack::push(ODBCTraceCall *call)
 {
-	//We have to take care about concurrent access...
 	MutexGuard guard(&lock);
 	for (int i = 0; i < ODBCTRACE_STACKSIZE; i++)
 		if (stack[i] == NULL)
@@ -78,7 +77,6 @@ int ODBCTraceStack::push(ODBCTraceCall *call)
 }
 ODBCTraceCall* ODBCTraceStack::pop(int index)
 {
-	//We have to take care about concurrent access...
 	MutexGuard guard(&lock);
 	ODBCTraceCall *call = stack[index];
 	stack[index] = NULL;
@@ -163,41 +161,36 @@ RETCODE SQL_API TraceSQLExecDirectW(SQLHSTMT hstmt, SQLWCHAR FAR *szSqlStr, SQLI
 
 }
 
-BOOL APIENTRY DllMain( HANDLE hModule, 
-                       DWORD  ul_reason_for_call, 
-                       LPVOID lpReserved
-					 )
+RETCODE SQL_API TraceSQLCloseCursor(SQLHSTMT Handle)
 {
-	//instance = (HINSTANCE)hModule;
+	ODBCTraceCall *call = new ODBCTraceCall();
 
-	switch (ul_reason_for_call) 
-	{
-		case DLL_PROCESS_ATTACH:
-			break;
-		case DLL_THREAD_ATTACH:
-			break;
-		case DLL_PROCESS_DETACH:
-			break;
-		case DLL_THREAD_DETACH:
-			break;
-		default:
-			break;
-	}
-	return TRUE;
+	call->insertArgument("Handle", TYP_SQLHSTMT, Handle);
+
+	call->function_name = "SQLCloseCursor";
+	call->function_id = SQL_API_SQLCLOSECURSOR;
+
+	ODBCTrace(call, true);
+	return (RETCODE)stack.push(call);
+
 }
 
-RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)// open a trace log file
+RETCODE	SQL_API TraceOpenLogFile(LPWSTR s, LPWSTR t, DWORD w)
 {
 	char buffer[256]; wcstombs(buffer, s, sizeof(buffer));
+
+	//Pause for attaching
 	//MessageBox(NULL, buffer, "Log file", MB_OK | MB_ICONQUESTION);
 	ODBCTraceOptions::getUniqueInstance()->logfile = buffer;
 	return 0;
 }
-RETCODE	SQL_API TraceCloseLogFile()			// Request to close a trace log
+
+RETCODE	SQL_API TraceCloseLogFile()
 {
 	return 0;
 }
-VOID SQL_API TraceReturn(RETCODE rethandle, RETCODE retcode)	// Processes trace after FN is called
+
+VOID SQL_API TraceReturn(RETCODE rethandle, RETCODE retcode)
 {
 	ODBCTraceCall* call = stack.pop(rethandle);
 	if (call != NULL)
@@ -207,7 +200,7 @@ VOID SQL_API TraceReturn(RETCODE rethandle, RETCODE retcode)	// Processes trace 
 		delete call;
 	}
 }
-DWORD SQL_API TraceVersion()					// Returns trace API version
+DWORD SQL_API TraceVersion()
 {
 	return TRACE_VERSION;
 }
@@ -1834,19 +1827,6 @@ DWORD SQL_API TraceVersion()					// Returns trace API version
 //
 //	call->function_name = "SQLBulkOperations";
 //	call->function_id = SQL_API_SQLBULKOPERATIONS;
-//
-//	ODBCTrace(call, true);
-//	return (RETCODE)stack.push(call);
-//
-//}
-//RETCODE SQL_API TraceSQLCloseCursor(SQLHSTMT Handle)
-//{
-//	ODBCTraceCall *call = new ODBCTraceCall();
-//
-//	call->insertArgument("Handle", TYP_SQLHSTMT, Handle);
-//
-//	call->function_name = "SQLCloseCursor";
-//	call->function_id = SQL_API_SQLCLOSECURSOR;
 //
 //	ODBCTrace(call, true);
 //	return (RETCODE)stack.push(call);

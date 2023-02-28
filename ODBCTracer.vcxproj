@@ -193,6 +193,7 @@ if $(Configuration)==Debug copy $(TargetDir)$(TargetName).pdb $(SystemRoot)\sysn
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -249,7 +250,7 @@ if $(Configuration)==Debug copy $(TargetDir)$(TargetName).pdb $(SystemRoot)\sysn
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="odbctracedump.cpp">
+    <ClCompile Include="ODBCTraceDump.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ODBCDRIVER_EXPORTS;WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;ODBCTracer_EXPORTS</PreprocessorDefinitions>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EnableFastChecks</BasicRuntimeChecks>

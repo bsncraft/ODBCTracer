@@ -56,6 +56,8 @@ public:
 	bool fileloggingactivated;
 	std::string logfile;
 	std::vector<std::string> keys;
+	std::map<std::string, std::string> logs;
+	std::map<std::string, std::clock_t> clocks;
 };
 
 #define ODBCTRACE_STACKSIZE 256

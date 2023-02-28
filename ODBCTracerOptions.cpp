@@ -8,11 +8,8 @@
 
 void ODBCTraceOptions::init(const char *fn, int fid)
 {
-	//First fill the functionname 2 functionid hashtable...
 	fn2id.insert(CHAR2FuncSwitchMAP::value_type(fn, fid));
-	//vector containing all functionnames
 	keys.insert(keys.end(), fn);
-	//initialize all functions for logging
 	setLogFunction(fn, true); 
 }
 
@@ -21,6 +18,7 @@ ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 	TraceFuncOption(TraceSQLPrepare, SQL_API_SQLPREPARE);
 	TraceFuncOption(TraceSQLFreeStmt, SQL_API_SQLFREESTMT);
 	TraceFuncOption(TraceSQLExecDirect, SQL_API_SQLEXECDIRECT);
+	TraceFuncOption(TraceSQLCloseCursor, SQL_API_SQLCLOSECURSOR);
 
 	/*TraceFuncOption(TraceSQLDataSources, SQL_API_SQLDATASOURCES);
 	TraceFuncOption(TraceSQLAllocHandleStd, SQL_API_SQLALLOCHANDLESTD);
@@ -81,8 +79,7 @@ ODBCTraceOptions::ODBCTraceOptions() : fileloggingactivated(true)
 	TraceFuncOption(TraceSQLSetCursorName, SQL_API_SQLSETCURSORNAME);
 	TraceFuncOption(TraceSQLGetCursorName, SQL_API_SQLGETCURSORNAME);
 	TraceFuncOption(TraceSQLSetPos, SQL_API_SQLSETPOS);
-	TraceFuncOption(TraceSQLBulkOperations, SQL_API_SQLBULKOPERATIONS);
-	TraceFuncOption(TraceSQLCloseCursor, SQL_API_SQLCLOSECURSOR);
+	TraceFuncOption(TraceSQLBulkOperations, SQL_API_SQLBULKOPERATIONS);	
 	TraceFuncOption(TraceSQLGetInfo, SQL_API_SQLGETINFO);
 	TraceFuncOption(TraceSQLGetTypeInfo, SQL_API_SQLGETTYPEINFO);
 	TraceFuncOption(TraceSQLGetFunctions, SQL_API_SQLGETFUNCTIONS);

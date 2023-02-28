@@ -9,6 +9,7 @@ TraceSQLExecDirectW
 TraceSQLFreeStmt
 TraceSQLPrepare
 TraceSQLPrepareW
+TraceSQLCloseCursor
 
 ;TraceSQLAllocConnect
 ;TraceSQLAllocEnv
@@ -97,7 +98,6 @@ TraceSQLPrepareW
 ;TraceSQLColAttribute
 ;TraceSQLColAttributeW
 ;TraceSQLBulkOperations
-;TraceSQLCloseCursor
 TraceOpenLogFile
 TraceCloseLogFile
 TraceReturn

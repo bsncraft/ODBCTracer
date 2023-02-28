@@ -1,22 +1,4 @@
-/**
- * Copyright (C) 2002-2005
- * W3L GmbH
- * Technologiezentrum Ruhr
- * Universit‰tsstraﬂe 142
- * D-44799 Bochum
- * 
- * Author: Dipl.Ing. Doga Arinir
- * E-Mail: doga.arinir@w3l.de
- *
- * This software is provided 'as-is', without any express or implied
- * warranty.  In no event will the author or the company be held liable 
- * for any damages arising from the use of this software. EXPECT BUGS!
- * 
- * You may use this software in compiled form in any way you desire PROVIDING it is
- * not sold for profit without the authors written permission, and providing that this
- * notice and the authors name is included. If the source code in this file is used in 
- * any commercial application then acknowledgement must be made to the author of this file.
- */
+
 #include "stdafx.h"
 #include "odbctracer.h"
 #include <sys/stat.h>
@@ -26,7 +8,6 @@
 #include "sqlext.h"
 
 #define MAX_BUFFER_CONVERT 1024
-
 
 #define ID2STRINGMAP_BEGIN(funcname) \
 char * funcname(int code) \
@@ -305,7 +286,7 @@ void ODBCTraceErrors(ODBCTraceCall *call)
 
 void ODBCTraceArg(ODBCTraceCall *call, int argnumber)
 {
-	ODBCTraceArgument *arg = &call->arguments[argnumber];
+	ODBCTraceArgument *arg = &call->arguments[argnumber];	
 	switch(arg->type)
 	{
 	case TYP_SQLSMALLINT:
@@ -313,9 +294,9 @@ void ODBCTraceArg(ODBCTraceCall *call, int argnumber)
 	case TYP_SQLINTEGER:
 	case TYP_SQLUINTEGER:
 		if (call->function_id == SQL_API_SQLGETINFO && argnumber == 1)
-			ODBCTraceDump("\t\t\t%s\t%s\t%d (%s)\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, GetInfoType2Char((int)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t%d (%s)", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, GetInfoType2Char((int)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t%d\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
+			ODBCTraceDump("\t\t\t%s\t%s\t%d", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
 		break;
 
 	case TYP_SQLWCHAR_PTR:
@@ -323,41 +304,41 @@ void ODBCTraceArg(ODBCTraceCall *call, int argnumber)
 		if (arg->value)
 		{
 			char buffer[256];wcstombs(buffer, (SQLWCHAR*)arg->value, sizeof(buffer));
-			ODBCTraceDump("\t\t\t%s\t%s\t%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), buffer);
+			ODBCTraceDump("\t\t\t%s\t%s\t%s", arg->name.c_str(), TracerType2SQLType(arg->type), buffer);
 		}
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\tNullpointer\r\n", arg->name.c_str(), TracerType2SQLType(arg->type));
+			ODBCTraceDump("\t\t\t%s\t%s\tNullpointer", arg->name.c_str(), TracerType2SQLType(arg->type));
 		break;
 	}
 	case TYP_SQLCHAR_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
+			ODBCTraceDump("\t\t\t%s\t%s\t%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\tNullpointer\r\n", arg->name.c_str(), TracerType2SQLType(arg->type));
+			ODBCTraceDump("\t\t\t%s\t%s\tNullpointer", arg->name.c_str(), TracerType2SQLType(arg->type));
 		break;
 	case TYP_SQLSMALLINT_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLSMALLINT*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLSMALLINT*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLUSMALLINT_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLUSMALLINT*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLUSMALLINT*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLINTEGER_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLINTEGER*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLINTEGER*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLUINTEGER_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLUINTEGER*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLUINTEGER*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 
 	case TYP_SQLPOINTER:
@@ -381,7 +362,7 @@ void ODBCTraceArg(ODBCTraceCall *call, int argnumber)
 			catch (int ex) { }
 		}
 
-		ODBCTraceDump("\r\n");
+		//ODBCTraceDump("\r\n");
 		break;
 	}
 	case TYP_SQLPOINTER_PTR:
@@ -391,77 +372,163 @@ void ODBCTraceArg(ODBCTraceCall *call, int argnumber)
 	case TYP_SQLHWND:
 	case TYP_SQLHENV:
 	case TYP_SQLHANDLE:
-		ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
+		ODBCTraceDump("\t\t\t%s\t%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value);
 		break;
 
 	case TYP_SQLHDESC_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHDESC*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHDESC*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLHSTMT_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHSTMT*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHSTMT*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLHDBC_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHDBC*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHDBC*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLHWND_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHWND*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHWND*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLHENV_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHENV*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHENV*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_SQLHANDLE_PTR:
 		if (arg->value)
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHANDLE*)arg->value));
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\t0x%08x", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str(), *((SQLHANDLE*)arg->value));
 		else
-			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s\r\n", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
+			ODBCTraceDump("\t\t\t%s\t%s\t0x%08x\t*%s", arg->name.c_str(), TracerType2SQLType(arg->type), arg->value, arg->name.c_str());
 		break;
 	case TYP_UNKNOWN:
 	default:
-		ODBCTraceDump("\t\t\tUnknown argument type of %s (%d)\r\n", arg->name.c_str(), arg->type);
+		ODBCTraceDump("\t\t\tUnknown argument type of %s (%d)", arg->name.c_str(), arg->type);
 	}
 }
 
-void ODBCTrace(ODBCTraceCall *call, bool calling)
+void ODBCWriteLog(std::string log)
+{
+	if (ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
+	{
+		FILE* file = fopen(ODBCTraceOptions::getUniqueInstance()->logfile.c_str(), "a");
+
+		if (file)
+		{
+			char logtime[64]; _strtime(logtime);
+			fprintf(file, "%s %s\r\n", logtime, log.c_str());
+			fclose(file);
+		}
+	}
+}
+
+void ODBCTrace(ODBCTraceCall* call, bool calling)
+{
+	if (disable_all_tracing || calling) return;
+	ODBCTraceOptions* option = ODBCTraceOptions::getUniqueInstance();
+
+	//log the functions of interest...
+	if (option->logFunction(call->function_id))
+	{
+		
+		const std::string procId = std::to_string(GetCurrentProcessId());
+		const std::string proc = procId + "-" + std::to_string(GetCurrentThreadId());		
+		const std::clock_t begin_time = clock();
+
+		for (int i = 0; i < call->arguments_count; i++)
+		{
+			ODBCTraceArgument* arg = &call->arguments[i];
+			switch (arg->type)
+			{
+				case TYP_SQLWCHAR_PTR:
+				{
+					if (!arg->value)
+						return;
+
+					char buffer[16000]; 
+					wcstombs(buffer, (SQLWCHAR*)arg->value, sizeof(buffer));
+					option->clocks[proc] = begin_time;
+					option->logs[proc] = buffer;
+					memset(buffer, 0, sizeof buffer);
+					return;
+				}
+				case TYP_SQLCHAR_PTR:
+				{
+					if (!arg->value)
+						return;
+				
+					option->clocks[proc] = begin_time;
+					option->logs[proc] = (char*)arg->value;
+					return;
+				}
+			}
+		}
+
+		char	szProcName[MAX_PATH];
+		std::string s = GetCommandLine();
+		if (s.find('\/') > 0)
+		{
+			s= s.substr(0, s.find('\/'));
+		}
+
+		_splitpath(s.c_str(), NULL, NULL, szProcName, NULL);
+		std::string log = szProcName;
+		log.append(' ' + procId + ' ');				
+
+		if (option->clocks.count(proc) > 0)
+		{
+			auto ticks = float(begin_time - option->clocks.at(proc)) / CLOCKS_PER_SEC;
+			option->clocks.erase(proc);
+			log.append(' ' + std::to_string(round(ticks * 100) / 100).substr(0, 4));
+			log.append("ms ");
+		}
+
+		if (option->logs.count(proc) > 0)
+		{
+			log.append(option->logs.at(proc));
+			option->logs.erase(proc);
+		}
+
+		ODBCWriteLog(log);
+	}
+}
+
+void ODBCTraceOld(ODBCTraceCall *call, bool calling)
 {
 	if (disable_all_tracing) return;
 
-	ODBCTraceOptions *option = ODBCTraceOptions::getUniqueInstance();
+	ODBCTraceOptions* option = ODBCTraceOptions::getUniqueInstance();
 
 	//log the functions of interest...
 	if (option->logFunction(call->function_id))
 	{
 		char	szProcName[MAX_PATH];
-		_splitpath(GetCommandLine(), NULL,  NULL, szProcName, NULL);
+		_splitpath(GetCommandLine(), NULL, NULL, szProcName, NULL);
 
 		//Dump general information....
 		ODBCTraceDump("%s\t%d-%d\t",
-				szProcName, 
-				GetCurrentProcessId(), 
-				GetCurrentThreadId());
+			szProcName,
+			GetCurrentProcessId(),
+			GetCurrentThreadId());
 
 		if (calling)
 			ODBCTraceDump("ENTER\t%s\r\n", call->function_name.c_str());
 		else
-			ODBCTraceDump("EXIT\t%s\twith return code %d (%s)\r\n", 
-								call->function_name.c_str(),
-								call->retcode,
-								Returncode2Char(call->retcode));
-		
+			ODBCTraceDump("EXIT\t%s\twith return code %d (%s)\r\n",
+				call->function_name.c_str(),
+				call->retcode,
+				Returncode2Char(call->retcode));
+
 		//arguments
 		for (int i = 0; i < call->arguments_count; i++)
 			ODBCTraceArg(call, i);
@@ -476,20 +543,13 @@ void ODBCTrace(ODBCTraceCall *call, bool calling)
 	}
 }
 
-
 void ODBCTraceDump(const char *text, ...)
 {
 	char buffer[MAX_BUFFER_CONVERT];
-
 	va_list args;
 	va_start(args, text);
-
 	int length = _vsnprintf(buffer, MAX_BUFFER_CONVERT - 1, text, args);
-
 	va_end(args);
-
-	//Console output
-	//ODBCTraceDialog::getUniqueInstance()->appendText(buffer);
 
 	//File output
 	if (ODBCTraceOptions::getUniqueInstance()->fileloggingactivated)
@@ -498,11 +558,10 @@ void ODBCTraceDump(const char *text, ...)
 		//be able to delete the file while the odbctracer is running...
 		FILE *file = fopen(ODBCTraceOptions::getUniqueInstance()->logfile.c_str(), "a");
 
-
 		if (file)
 		{
 			char logtime[64];_strtime(logtime);
-			fprintf(file, "%s\t%s", logtime, buffer);
+			fprintf(file, "%s %s\r\n", logtime, buffer);
 			fclose(file);
 		}
 	}
